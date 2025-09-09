@@ -12,7 +12,12 @@ const server = http.createServer(app);
 
 const io = socketIo(server, {
   cors: {
-    origin: ["http://localhost:3000", "http://localhost:5174", "http://localhost:5173"],
+    origin: [
+      "http://localhost:3000", 
+      "http://localhost:5174", 
+      "http://localhost:5173",
+      "https://quiz-frontend-ykfx.onrender.com"
+    ],
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -23,7 +28,15 @@ app.set('io', io);
 connectDB();
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174', 'http://192.168.*.*:3000', 'http://192.168.*.*:5173', 'http://192.168.*.*:5174'],
+  origin: [
+    'http://localhost:3000', 
+    'http://localhost:5173', 
+    'http://localhost:5174', 
+    'http://192.168.*.*:3000', 
+    'http://192.168.*.*:5173', 
+    'http://192.168.*.*:5174',
+    'https://quiz-frontend-ykfx.onrender.com'
+  ],
   credentials: true
 }));
 app.use(express.json());

@@ -137,15 +137,33 @@ router.get('/:quizId/results', async (req, res) => {
   }
 });
 
-// Clean up route for development - removes all votes
+// Clean up route for development - removes all votes and fixes indexes
 router.delete('/cleanup', async (req, res) => {
   try {
-    const result = await Vote.deleteMany({});
+    // Delete all votes
+    const deleteResult = await Vote.deleteMany({});
+    
+    // Drop old indexes to prevent conflicts
+    try {
+      await Vote.collection.dropIndex('quizId_1_userId_1');
+      console.log('Dropped old index: quizId_1_userId_1');
+    } catch (indexError) {
+      console.log('Old index already removed or never existed');
+    }
+    
+    // Ensure the new index exists
+    await Vote.collection.createIndex(
+      { quizId: 1, userId: 1, questionIndex: 1 }, 
+      { unique: true }
+    );
+    console.log('Created new index: quizId_1_userId_1_questionIndex_1');
+    
     res.json({ 
-      message: `Deleted ${result.deletedCount} votes`,
-      deletedCount: result.deletedCount
+      message: `Database cleanup complete. Deleted ${deleteResult.deletedCount} votes and fixed indexes.`,
+      deletedCount: deleteResult.deletedCount
     });
   } catch (error) {
+    console.error('Cleanup error:', error);
     res.status(500).json({ message: error.message });
   }
 });
